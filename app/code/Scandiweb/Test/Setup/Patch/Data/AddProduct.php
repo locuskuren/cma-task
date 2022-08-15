@@ -1,9 +1,10 @@
 <?php
+
 /**
- * @category    Example
- * @package     Example_Migration
- * @author      Ralfs Aizsils <info@scandiweb.com>
- * @copyright   Copyright (c) 2021 Scandiweb, Ltd (https://scandiweb.com)
+ * @category    Scandiweb
+ * @package     Scandiweb_Test
+ * @author      Andris Zuravlovs <andris.zuravlovs@scandiweb.com>
+ * @copyright   Copyright (c) 2022 Scandiweb, Ltd (https://scandiweb.com)
  */
 
 namespace Scandiweb\Test\Setup\Patch\Data;
@@ -82,7 +83,7 @@ class AddProduct implements DataPatchInterface
      * @param SourceItemsSaveInterface $sourceItemsSaveInterface
      * @param State $appState
      * @param StoreManagerInterface $storeManager
-		 * @param EavSetup $eavSetup
+     * @param EavSetup $eavSetup
      * @param CategoryLinkManagementInterface $categoryLink
      */
     public function __construct(
@@ -91,18 +92,18 @@ class AddProduct implements DataPatchInterface
         State $appState,
         StoreManagerInterface $storeManager,
         EavSetup $eavSetup,
-				SourceItemInterfaceFactory $sourceItemFactory,
+        SourceItemInterfaceFactory $sourceItemFactory,
         SourceItemsSaveInterface $sourceItemsSaveInterface,
-				CategoryLinkManagementInterface $categoryLink
+        CategoryLinkManagementInterface $categoryLink
     ) {
         $this->appState = $appState;
         $this->productInterfaceFactory = $productInterfaceFactory;
         $this->productRepository = $productRepository;
-				$this->eavSetup = $eavSetup;
+        $this->eavSetup = $eavSetup;
         $this->storeManager = $storeManager;
         $this->sourceItemFactory = $sourceItemFactory;
         $this->sourceItemsSaveInterface = $sourceItemsSaveInterface;
-				$this->categoryLink = $categoryLink;
+        $this->categoryLink = $categoryLink;
     }
 
     /**
@@ -110,7 +111,7 @@ class AddProduct implements DataPatchInterface
      */
     public function apply(): void
     {
-        $this->appState->emulateAreaCode('adminhtml', [$this, 'execute']);
+        $this->appState->emulateAreaCode("adminhtml", [$this, "execute"]);
     }
 
     /**
@@ -124,14 +125,17 @@ class AddProduct implements DataPatchInterface
     {
         $product = $this->productInterfaceFactory->create();
 
-        if ($product->getIdBySku('grip-trainer')) {
+        if ($product->getIdBySku("t-shirt")) {
             return;
         }
 
-        $attributeSetId = $this->eavSetup->getAttributeSetId(Product::ENTITY, 'Default');
+        $attributeSetId = $this->eavSetup->getAttributeSetId(
+            Product::ENTITY,
+            "Default"
+        );
         $websiteIDs = [$this->storeManager->getStore()->getWebsiteId()];
-				$product->setTypeId(Type::TYPE_SIMPLE)
-            >setTypeId(Type::TYPE_SIMPLE)
+        $product
+            ->setTypeId(Type::TYPE_SIMPLE)
             ->setWebsiteIds($websiteIDs)
             ->setAttributeSetId($attributeSetId)
             ->setName("t-shirt")
@@ -140,11 +144,15 @@ class AddProduct implements DataPatchInterface
             ->setPrice(9.99)
             ->setVisibility(Visibility::VISIBILITY_BOTH)
             ->setStatus(Status::STATUS_ENABLED)
-            ->setStockData(['use_config_manage_stock' => 1, 'is_qty_decimal' => 0, 'is_in_stock' => 1]);
+            ->setStockData([
+                "use_config_manage_stock" => 1,
+                "is_qty_decimal" => 0,
+                "is_in_stock" => 1,
+            ]);
         $product = $this->productRepository->save($product);
 
         $sourceItem = $this->sourceItemFactory->create();
-        $sourceItem->setSourceCode('default');
+        $sourceItem->setSourceCode("default");
         $sourceItem->setQuantity(10);
         $sourceItem->setSku($product->getSku());
         $sourceItem->setStatus(SourceItemInterface::STATUS_IN_STOCK);
@@ -152,7 +160,7 @@ class AddProduct implements DataPatchInterface
 
         $this->sourceItemsSaveInterface->execute($this->sourceItems);
 
-				$this->categoryLink->assignProductToCategories($product->getSku(), [2]);
+        $this->categoryLink->assignProductToCategories($product->getSku(), [2]);
     }
 
     /**
