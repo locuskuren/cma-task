@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @category    Example
  * @package     Example_Migration
@@ -74,7 +73,6 @@ class AddProduct implements DataPatchInterface
      */
     protected array $sourceItems = [];
 
-
     /**
      * Migration patch constructor.
      *
@@ -126,18 +124,19 @@ class AddProduct implements DataPatchInterface
     {
         $product = $this->productInterfaceFactory->create();
 
-        if ($product->getIdBySku('t-shirt')) {
+        if ($product->getIdBySku('grip-trainer')) {
             return;
         }
 
         $attributeSetId = $this->eavSetup->getAttributeSetId(Product::ENTITY, 'Default');
         $websiteIDs = [$this->storeManager->getStore()->getWebsiteId()];
 				$product->setTypeId(Type::TYPE_SIMPLE)
+            >setTypeId(Type::TYPE_SIMPLE)
             ->setWebsiteIds($websiteIDs)
             ->setAttributeSetId($attributeSetId)
-            ->setName('t-shirt')
-						->setUrlKey('t-shirt')
-            ->setSku('t-shirt')
+            ->setName("t-shirt")
+            ->setUrlKey("t-shirt")
+            ->setSku("t-shirt")
             ->setPrice(9.99)
             ->setVisibility(Visibility::VISIBILITY_BOTH)
             ->setStatus(Status::STATUS_ENABLED)
@@ -153,7 +152,7 @@ class AddProduct implements DataPatchInterface
 
         $this->sourceItemsSaveInterface->execute($this->sourceItems);
 
-		$this->categoryLink->assignProductToCategories($product->getSku(), [2]);
+				$this->categoryLink->assignProductToCategories($product->getSku(), [2]);
     }
 
     /**
